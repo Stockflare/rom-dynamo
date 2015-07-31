@@ -1,0 +1,9 @@
+dynamo:
+  image: deangiberson/aws-dynamodb-local
+rom:
+  build: .
+  command: dotenv rspec
+  volumes:
+    - .:/stockflare
+  links:
+    - dynamo
