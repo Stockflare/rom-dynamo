@@ -2,10 +2,11 @@ module ROM
   module Dynamo
     class Relation < ROM::Relation
       require 'rom/dynamo/relation/dataset'
+      require 'rom/dynamo/relation/retrieval_dataset'
 
       adapter :dynamo
 
-      forward :restrict
+      forward :query, :scan, :retrieve
 
       def insert(*args)
         dataset.insert(*args)

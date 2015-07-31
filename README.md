@@ -11,7 +11,7 @@ This gem does not handle the creation or deletion of DynamoDB tables. I recommen
 Setup the Dynamo repository like so:
 
 ```
-rom = ROM.setup(:dynamo, table: 'my_dynamo_table_name', region: 'us-east-1')
+rom = ROM.setup(:dynamo, region: 'us-east-1')
 ```
 
 ## Development

@@ -4,13 +4,13 @@ module ROM
   module Dynamo
     class Repository < ROM::Gateway
       def initialize(opts = {})
-        raise "expected Dynamo Table name" if opts[:table].nil?
+        raise "expected AWS Region" if opts[:region].nil?
         @connection = initialize_connection(opts)
         @datasets = {}
       end
 
       def dataset(name)
-        @datasets[name] ||= Dataset.new(name, @connection)
+        @datasets[name] ||= Relation::Dataset.new(name, @connection)
       end
 
       def dataset?(name)
@@ -25,7 +25,7 @@ module ROM
       private
 
       def initialize_connection(opts = {})
-
+        Aws::DynamoDB::Client.new(region: opts[:region])
       end
     end
   end

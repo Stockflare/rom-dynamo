@@ -1,28 +1,40 @@
 module ROM
   describe Dynamo::Relation do
 
-    let(:table_name) { "example_table_name" }
+    include_context 'dynamo' do
+      let(:table_name) { :basic_table }
 
-    let(:table) {
-      {
-        :table_name => table_name,
-        :attribute_definitions => [{
-          :attribute_name => :Id,
-          :attribute_type => :N
-        }],
-        :key_schema => [{
-          :attribute_name => :Id,
-          :key_type => :HASH
-        }],
-        :provisioned_throughput => {
-          :read_capacity_units => 1,
-          :write_capacity_units => 1,
-        }
+      let(:table) { build(:basic_table, table_name: table_name.to_s) }
+    end
+
+    include_context 'rom setup' do
+      let(:definitions) {
+        Proc.new do
+          # relation(:basic_table) do
+          #   def by_id(id)
+          #     retrieve(key: { id: id })
+          #   end
+          # end
+          relation(:basic_table) { }
+          commands(:basic_table) do
+            define(:create) { result :one }
+            define(:update) { result :one }
+            define(:delete) { result :one }
+          end
+        end
       }
-    }
+    end
 
-    around { |b| create_table_and_wait(table, &b) }
+    context 'creation' do
+      let(:basic) { build(:basic) }
 
-    it { true }
+      specify { expect { subject.command(:basic_table).create.call(basic) }.to_not raise_error }
+
+      # specify { puts subject.relation(:basic_table).by_id(id).one!["id"].to .inspect }
+
+      # specify { puts subject.inspect }
+
+    end
+
   end
 end

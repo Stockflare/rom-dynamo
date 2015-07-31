@@ -4,17 +4,19 @@ module ROM
       class Dataset
         include Equalizer.new(:name, :connection)
 
-        attr_reader :name, :connection, :conditions
+        attr_reader :name, :connection, :chain
 
-        def initialize(name, connection, conditions = nil)
-          @name, @connection = name, ddb
-          @conditions = conditions || {}
+        def initialize(name, connection, chain = nil)
+          @name, @connection = name, connection
+          @chain = chain || {}
         end
 
         def restrict(query = nil)
-          return self if query.nil?
-          conds = @conditions.merge(query)
-          dup_as(Dataset, conditions: conds)
+          build(query) { |q| dup_as(Dataset, chain: q) }
+        end
+
+        def retrieve(query = nil)
+          build(query) { |q| dup_as(RetrievalDataset, chain: q) }
         end
 
         # def scan(hash)
@@ -26,7 +28,7 @@ module ROM
         end
 
         def insert(hash)
-          connection.put_item merge_table_name(hash)
+          connection.put_item merge_table_name(item: hash)
         end
 
         def delete(hash)
@@ -34,12 +36,17 @@ module ROM
         end
 
         def each(&block)
-          each_item(merge_table_name(@conditions), &block)
+          each_item(merge_table_name(@chain), &block)
         end
 
         private
 
-        def each_items(body, &block)
+        def build(query)
+          return self if query.nil?
+          yield @chain.deep_merge(query)
+        end
+
+        def each_item(body, &block)
           connection.query(body).data.each do |resp|
             puts "Response Item..."
             puts resp.inspect
@@ -52,7 +59,7 @@ module ROM
         end
 
         def dup_as(klass, opts = {})
-          vars = [:@name, :@connection, :@conditions]
+          vars = [:@name, :@connection, :@chain]
           klass.allocate.tap do |out|
             vars.each { |k| out.instance_variable_set(k, instance_variable_get(k)) }
             opts.each { |k, v| out.instance_variable_set("@#{k}", v) }
