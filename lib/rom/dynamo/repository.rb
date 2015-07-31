@@ -1,8 +1,8 @@
 require 'rom/repository'
 
-module Rom
+module ROM
   module Dynamo
-    class Repository < ROM::Repository
+    class Repository < ROM::Gateway
       def initialize(opts = {})
         raise "expected Dynamo Table name" if opts[:table].nil?
         @connection = initialize_connection(opts)

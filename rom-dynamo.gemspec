@@ -5,7 +5,7 @@ require 'rom/dynamo/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'rom-dynamo'
-  spec.version       = Rom::Dynamo::VERSION
+  spec.version       = ROM::Dynamo::VERSION
   spec.authors       = ['Michael Rykov', 'David Kelley']
   spec.email         = ['mrykov@gmail.com', 'david@stockflare.com']
 

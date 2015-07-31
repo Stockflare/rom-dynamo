@@ -5,4 +5,4 @@ require 'rom/dynamo/relation'
 require 'rom/dynamo/commands'
 require 'rom/dynamo/repository'
 
-ROM.register_adapter(:dynamo, Rom::Dynamo)
+ROM.register_adapter(:dynamo, ROM::Dynamo)
