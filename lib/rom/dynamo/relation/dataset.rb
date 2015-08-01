@@ -19,6 +19,10 @@ module ROM
           build(query) { |q| dup_as(RetrievalDataset, chain: q) }
         end
 
+        def scan(query = nil)
+          build(query) { |q| dup_as(ScanDataset, chain: q) }
+        end
+
         # def scan(hash)
         #   connection.scan merge_table_name(hash)
         # end
@@ -47,11 +51,7 @@ module ROM
         end
 
         def each_item(body, &block)
-          connection.query(body).data.each do |resp|
-            puts "Response Item..."
-            puts resp.inspect
-            block.call(resp)
-          end
+          connection.query(body).data.items.each(&block)
         end
 
         def merge_table_name(hash)

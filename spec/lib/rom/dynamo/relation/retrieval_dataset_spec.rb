@@ -45,63 +45,29 @@ module ROM
 
       let(:five_star_review) { "Do yourself a favor and buy this." }
 
-      let(:item) {
-        {
-          id: id,
-          Title: "20-Bicycle 205",
-          Description: "205 description",
-          BicycleType: "Hybrid",
-          Brand: "Brand-Company C",
-          Price: 500,
-          Gender: "B",
-          Color: Set.new(["Red", "Black"]),
-          ProductCategory: "Bike",
-          InStock: true,
-          QuantityOnHand: nil,
-          NumberSold: BigDecimal.new("1E4"),
-          RelatedItems: [
-            341,
-            472,
-            649
-          ],
-          Pictures: { # JSON Map of views to url String
-            FrontView: "http://example.com/products/205_front.jpg",
-            RearView: "http://example.com/products/205_rear.jpg",
-            SideView: "http://example.com/products/205_left_side.jpg",
-          },
-          ProductReviews: { # JSON Map of stars to List of review Strings
-            FiveStar: [
-              "Excellent! Can't recommend it highly enough!  Buy it!",
-              five_star_review
-            ],
-            OneStar: [
-              "Terrible product!  Do not buy this."
-            ]
-          }
-        }
-      }
+      let(:item) { build(:product, id: id, product_reviews: { five_star: [five_star_review] }) }
 
       before { subject.command(:basic_table).create.call(item) }
 
       describe '#by_id' do
         let(:response) { subject.relation(:basic_table).by_id(id).one! }
 
-        specify { expect(response["Price"].to_i).to eq 500 }
+        specify { expect(response["price"].to_i).to eq 500 }
 
-        specify { expect(response["ProductReviews"]["FiveStar"]).to include five_star_review }
+        specify { expect(response["product_reviews"]["five_star"]).to include five_star_review }
       end
 
       describe '#by_id.#with_expression.#with_projection' do
         let(:response) {
           subject.relation(:basic_table).by_id(id)
-            .with_expression("#pr" => "ProductReviews")
-            .with_expression("#ri" => "RelatedItems")
-            .with_projection("Price, Color, #pr.FiveStar, #ri[0], #ri[2], #pr.NoStar, #ri[4]").one!
+            .with_expression("#pr" => "product_reviews")
+            .with_expression("#ri" => "related_items")
+            .with_projection("price, color, #pr.five_star, #ri[0], #ri[2], #pr.no_star, #ri[4]").one!
         }
 
-        specify { expect(response["RelatedItems"].count).to eq 2 }
+        specify { expect(response["related_items"].count).to eq 2 }
 
-        specify { expect(response["Gender"]).to be_nil }
+        specify { expect(response["gender"]).to be_nil }
       end
     end
   end
