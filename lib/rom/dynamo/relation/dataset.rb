@@ -23,10 +23,6 @@ module ROM
           build(query) { |q| dup_as(ScanDataset, chain: q) }
         end
 
-        # def scan(hash)
-        #   connection.scan merge_table_name(hash)
-        # end
-
         def query(hash)
           connection.query merge_table_name(hash)
         end

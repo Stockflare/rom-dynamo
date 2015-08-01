@@ -1,11 +1,11 @@
 FactoryGirl.define do
-  factory :basic_table, class: Hash do
+  factory :time_series_table, class: Hash do
     table_name { Faker::Internet.domain_word }
 
     attribute_definitions do
       [{
         attribute_name: :id,
-        attribute_type: :N
+        attribute_type: :S
       }, {
         attribute_name: :date,
         attribute_type: :S

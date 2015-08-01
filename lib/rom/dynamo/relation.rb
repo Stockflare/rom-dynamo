@@ -7,7 +7,7 @@ module ROM
 
       adapter :dynamo
 
-      forward :query, :scan, :retrieve
+      forward :restrict, :scan, :retrieve
 
       def insert(*args)
         dataset.insert(*args)

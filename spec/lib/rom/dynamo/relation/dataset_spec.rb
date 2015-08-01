@@ -21,19 +21,39 @@ module ROM
         Proc.new do
           relation(:time_series_table) do
             def by_id(id)
-              retrieve(key: { id: id })
+              restrict(key_conditions: {
+                id: {
+                  comparison_operator: 'EQ',
+                  attribute_value_list: [id]
+                }
+              })
             end
 
             def between(after, before)
-
+              restrict(key_conditions: {
+                date: {
+                  comparison_operator: 'BETWEEN',
+                  attribute_value_list: [after, before]
+                }
+              })
             end
 
             def after(after)
-
+              restrict(key_conditions: {
+                date: {
+                  comparison_operator: 'GE',
+                  attribute_value_list: [after]
+                }
+              })
             end
 
             def before(before)
-
+              restrict(key_conditions: {
+                date: {
+                  comparison_operator: 'LE',
+                  attribute_value_list: [before]
+                }
+              })
             end
           end
 
@@ -43,40 +63,83 @@ module ROM
         end
       }
     end
-    #
-    # context 'projection expressions' do
-    #   let(:id) { 205 }
-    #
-    #   let(:five_star_review) { "Do yourself a favor and buy this." }
-    #
-    #   let(:item) { build(:product, id: id, product_reviews: { five_star: [five_star_review] }) }
-    #
-    #   before { subject.command(:time_series_table).create.call(item) }
-    #
-    #   describe '#by_id' do
-    #     let(:response) { subject.relation(:time_series_table).by_id(id).one! }
-    #
-    #     specify { expect(response["price"].to_i).to eq 500 }
-    #
-    #     specify { expect(response["product_reviews"]["five_star"]).to include five_star_review }
-    #   end
-    #
-    #   describe '#by_price' do
-    #     specify { expect { subject.relation(:time_series_table).by_price(item[:price]).one! }.to raise_error(Aws::DynamoDB::Errors::ValidationException) }
-    #   end
-    #
-    #   describe '#by_id.#with_expression.#with_projection' do
-    #     let(:response) {
-    #       subject.relation(:time_series_table).by_id(id)
-    #         .with_expression("#pr" => "product_reviews")
-    #         .with_expression("#ri" => "related_items")
-    #         .with_projection("price, color, #pr.five_star, #ri[0], #ri[2], #pr.no_star, #ri[4]").one!
-    #     }
-    #
-    #     specify { expect(response["related_items"].count).to eq 2 }
-    #
-    #     specify { expect(response["gender"]).to be_nil }
-    #   end
-    # end
+
+    context 'range (time-series) expressions' do
+      # eg: 2015-08-01
+      let(:id) { DateTime.now.strftime('%Y-%m-%d') }
+
+      let(:num_of_items) { 10 }
+
+      let(:time_step) { 60 }
+
+      before do
+        items = (0...num_of_items).to_a.map do |i|
+          date = (DateTime.now + time_step * (i + 1)).iso8601
+          build(:time_series, id: id, date: date)
+        end
+        items.each { |item| subject.command(:time_series_table).create.call item }
+      end
+
+      describe 'between all' do
+        let(:after) { DateTime.now.iso8601 }
+        let(:before) { (DateTime.now + (time_step * num_of_items) + 1).iso8601 }
+        let(:response) { subject.relation(:time_series_table).by_id(id).between(after, before).to_a }
+
+        specify { expect(response.size).to eq num_of_items }
+      end
+
+      describe 'between some time steps' do
+        let(:jump) { 2 }
+        let(:after) { (DateTime.now + (time_step * jump) + 1).iso8601 }
+        let(:before) { (DateTime.now + (time_step * (num_of_items - jump)) + 1).iso8601 }
+        let(:response) { subject.relation(:time_series_table).by_id(id).between(after, before).to_a }
+
+        specify { expect(response.size).to eq num_of_items - jump * 2 }
+      end
+
+      describe 'before last time step plus one second' do
+        let(:future) { (DateTime.now + (time_step * num_of_items) + 1).iso8601 }
+        let(:response) { subject.relation(:time_series_table).by_id(id).before(future).to_a }
+
+        specify { expect(response.size).to eq num_of_items }
+      end
+
+      describe 'before last time step minus two time steps' do
+        let(:future) { (DateTime.now + (time_step * (num_of_items - 2)) + 1).iso8601 }
+        let(:response) { subject.relation(:time_series_table).by_id(id).before(future).to_a }
+
+        specify { expect(response.size).to eq num_of_items - 2 }
+      end
+
+      describe 'before all' do
+        let(:now) { DateTime.now.iso8601 }
+        let(:response) { subject.relation(:time_series_table).by_id(id).before(now).to_a }
+
+        specify { expect(response).to be_empty }
+      end
+
+      describe 'after now' do
+        let(:now) { DateTime.now.iso8601 }
+        let(:response) { subject.relation(:time_series_table).by_id(id).after(now).to_a }
+
+        specify { expect(response.size).to eq num_of_items }
+      end
+
+      describe 'after two time steps' do
+        # Current time plus two time steps and an additional second
+        let(:now) { (DateTime.now + (time_step * 2) + 1).iso8601 }
+        let(:response) { subject.relation(:time_series_table).by_id(id).after(now).to_a }
+
+        specify { expect(response.size).to eq num_of_items - 2 }
+      end
+
+      describe 'after all' do
+        # Current time plus two time steps and an additional second
+        let(:now) { (DateTime.now + (time_step * num_of_items) + 1).iso8601 }
+        let(:response) { subject.relation(:time_series_table).by_id(id).after(now).to_a }
+
+        specify { expect(response).to be_empty }
+      end
+    end
   end
 end
