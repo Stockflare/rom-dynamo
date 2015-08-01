@@ -14,7 +14,13 @@ FactoryGirl.define do
 
     gender "B"
 
+    orders_placed 5
+
+    number_in_stock 20
+
     launch_date { { m: 12, d: 4, y: 1996 } }
+
+    features { { rover: true, pedals: false, wheels: true } }
 
     color { Set.new(["Red", "Black"]) }
 
@@ -46,6 +52,8 @@ FactoryGirl.define do
         ]
       }
     }
+
+    tags { Set.new(["#Mars", "#MarsCuriosity", "#StillRoving"]) }
 
     initialize_with { attributes }
   end

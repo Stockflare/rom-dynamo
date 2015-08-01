@@ -6,6 +6,9 @@ FactoryGirl.define do
       [{
         attribute_name: :id,
         attribute_type: :N
+      }, {
+        attribute_name: :date,
+        attribute_type: :S
       }]
     end
 
@@ -13,6 +16,9 @@ FactoryGirl.define do
       [{
         attribute_name: :id,
         key_type: :HASH
+      }, {
+        attribute_name: :date,
+        key_type: :RANGE
       }]
     end
 

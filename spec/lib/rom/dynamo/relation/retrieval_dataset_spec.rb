@@ -24,6 +24,11 @@ module ROM
               retrieve(key: { id: id })
             end
 
+            def by_price(price)
+              # will raise error as price isn't an index
+              retrieve(key: { price: price })
+            end
+
             def with_expression(map)
               retrieve(expression_attribute_names: map)
             end
@@ -55,6 +60,10 @@ module ROM
         specify { expect(response["price"].to_i).to eq 500 }
 
         specify { expect(response["product_reviews"]["five_star"]).to include five_star_review }
+      end
+
+      describe '#by_price' do
+        specify { expect { subject.relation(:basic_table).by_price(item[:price]).one! }.to raise_error(Aws::DynamoDB::Errors::ValidationException) }
       end
 
       describe '#by_id.#with_expression.#with_projection' do

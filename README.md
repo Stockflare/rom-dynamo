@@ -16,9 +16,9 @@ Setup the Dynamo repository like so:
 rom = ROM.setup(:dynamo, region: 'us-east-1')
 ```
 
-DynamoDB enables you to build really flexible and powerful queries. In addition to this fact and taking into  consideration that Amazon are constantly improving the capabilities of the querying syntax, I chose not to wrap the functionality that the API provides in a higher-level of abstraction.
+DynamoDB enables you to build really flexible and powerful queries. In addition to this and taking into consideration that Amazon are constantly improving the capabilities of the querying syntax, I chose not to wrap the functionality that the API provides in a higher-level of abstraction.
 
-The upside, is that this adapter can provide you with a _full_ query interface, enabling you to build some pretty complex calls quite simply; the downside is that you actually need to know how to build these queries.
+The upside, is that this adapter can provide you with a _full_ query interface, enabling you to build some pretty complex calls quite flexibly; the downside is that you actually need to know how to build these queries.
 
 ## Development
 
