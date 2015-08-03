@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :time_series, class: Hash do
+  factory :hash_range, class: Hash do
     id { Time.now.strftime('%Y-%m-%d') }
 
     date { Time.now.iso8601 }

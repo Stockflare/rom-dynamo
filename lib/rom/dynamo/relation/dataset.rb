@@ -11,6 +11,16 @@ module ROM
           @chain = chain || {}
         end
 
+        def limit(num = nil)
+          return self if num.nil?
+          build({ limit: num }) { |q| dup_as(Dataset, chain: q) }
+        end
+
+        def start(key)
+          return self if key.nil?
+          build({ exclusive_start_key: key }) { |q| dup_as(Dataset, chain: q) }
+        end
+
         def restrict(query = nil)
           build(query) { |q| dup_as(Dataset, chain: q) }
         end
@@ -39,6 +49,10 @@ module ROM
           each_item(merge_table_name(@chain), &block)
         end
 
+        def execute(body = chain)
+          @response ||= connection.query(merge_table_name(body)).data
+        end
+
         private
 
         def build(query)
@@ -47,7 +61,7 @@ module ROM
         end
 
         def each_item(body, &block)
-          connection.query(body).data.items.each(&block)
+          execute(body).items.each(&block)
         end
 
         def merge_table_name(hash)

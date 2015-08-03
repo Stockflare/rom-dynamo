@@ -6,5 +6,6 @@ require 'rom/dynamo/version'
 require 'rom/dynamo/relation'
 require 'rom/dynamo/commands'
 require 'rom/dynamo/gateway'
+require 'rom/dynamo/plugin'
 
 ROM.register_adapter(:dynamo, ROM::Dynamo)

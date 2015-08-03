@@ -11,15 +11,15 @@ module ROM
   describe Dynamo::Relation::ScanDataset do
 
     include_context 'dynamo' do
-      let(:table_name) { :basic_table }
+      let(:table_name) { :hash_table }
 
-      let(:table) { build(:basic_table, table_name: table_name) }
+      let(:table) { build(:hash_table, table_name: table_name) }
     end
 
     include_context 'rom setup' do
       let(:definitions) {
         Proc.new do
-          relation(:basic_table) do
+          relation(:hash_table) do
             def with_filter_expression(expr)
               scan(filter_expression: expr)
             end
@@ -33,7 +33,7 @@ module ROM
             end
           end
 
-          commands(:basic_table) do
+          commands(:hash_table) do
             define(:create) { result :one }
           end
         end
@@ -52,11 +52,11 @@ module ROM
 
       let(:item) { build(:product, title: title, launch_date: launch_date) }
 
-      before { subject.command(:basic_table).create.call(item) }
+      before { subject.command(:hash_table).create.call(item) }
 
       describe 'all products that dont have a launch month of November' do
         let(:response) {
-          subject.relation(:basic_table)
+          subject.relation(:hash_table)
             .with_projection('title')
             .with_filter_expression('launch_date.m <> :m')
             .with_expression_values(':m' => 11).one!
@@ -67,7 +67,7 @@ module ROM
 
       describe 'all rover products that dont have a launch month of November' do
         let(:response) {
-          subject.relation(:basic_table)
+          subject.relation(:hash_table)
             .with_projection('title')
             .with_filter_expression('attribute_exists(features.rover) AND launch_date.m <> :m')
             .with_expression_values(':m' => 11).one!
@@ -77,7 +77,7 @@ module ROM
       end
 
       describe 'non-rovers' do
-        specify { expect { subject.relation(:basic_table)
+        specify { expect { subject.relation(:hash_table)
           .with_projection('title')
           .with_filter_expression('attribute_not_exists(features.rover)').one!
         }.to raise_error(ROM::TupleCountMismatchError) }
@@ -85,7 +85,7 @@ module ROM
 
       describe 'mid-range rovers or inexpensive products' do
         let(:response) {
-          subject.relation(:basic_table)
+          subject.relation(:hash_table)
             .with_projection('title')
             .with_filter_expression('(price BETWEEN :low AND :high) OR price < :very_low')
             .with_expression_values({
@@ -99,7 +99,7 @@ module ROM
       end
 
       describe 'within-item referencing: more orders placed than in stock' do
-        specify { expect { subject.relation(:basic_table)
+        specify { expect { subject.relation(:hash_table)
           .with_projection('title')
           .with_filter_expression('orders_placed > number_in_stock').one!
         }.to raise_error(ROM::TupleCountMismatchError) }
@@ -107,7 +107,7 @@ module ROM
 
       describe 'string prefixing' do
         let(:response) {
-          subject.relation(:basic_table)
+          subject.relation(:hash_table)
             .with_projection('title')
             .with_filter_expression('begins_with(title, :s)')
             .with_expression_values(":s" => title[0]).one!
@@ -118,7 +118,7 @@ module ROM
 
       describe 'tags contain' do
         let(:response) {
-          subject.relation(:basic_table)
+          subject.relation(:hash_table)
             .with_projection('title')
             .with_filter_expression('contains(tags, :tag1) AND contains(tags, :tag2)')
             .with_expression_values({
@@ -132,7 +132,7 @@ module ROM
 
       describe 'in operator' do
         let(:response) {
-          subject.relation(:basic_table)
+          subject.relation(:hash_table)
             .with_projection('title')
             .with_filter_expression('id in (:id1, :id2)')
             .with_expression_values({
@@ -146,7 +146,7 @@ module ROM
 
       describe 'equivalently, with parentheses' do
         let(:response) {
-          subject.relation(:basic_table)
+          subject.relation(:hash_table)
             .with_projection('title')
             .with_filter_expression('(id = :id1) OR (id = :id2)')
             .with_expression_values({

@@ -11,15 +11,15 @@ module ROM
   describe Dynamo::Relation::RetrievalDataset do
 
     include_context 'dynamo' do
-      let(:table_name) { :basic_table }
+      let(:table_name) { :hash_table }
 
-      let(:table) { build(:basic_table, table_name: table_name) }
+      let(:table) { build(:hash_table, table_name: table_name) }
     end
 
     include_context 'rom setup' do
       let(:definitions) {
         Proc.new do
-          relation(:basic_table) do
+          relation(:hash_table) do
             def by_id(id)
               retrieve(key: { id: id })
             end
@@ -38,7 +38,7 @@ module ROM
             end
           end
 
-          commands(:basic_table) do
+          commands(:hash_table) do
             define(:create) { result :one }
           end
         end
@@ -52,10 +52,10 @@ module ROM
 
       let(:item) { build(:product, id: id, product_reviews: { five_star: [five_star_review] }) }
 
-      before { subject.command(:basic_table).create.call(item) }
+      before { subject.command(:hash_table).create.call(item) }
 
       describe '#by_id' do
-        let(:response) { subject.relation(:basic_table).by_id(id).one! }
+        let(:response) { subject.relation(:hash_table).by_id(id).one! }
 
         specify { expect(response["price"].to_i).to eq 500 }
 
@@ -63,12 +63,12 @@ module ROM
       end
 
       describe '#by_price' do
-        specify { expect { subject.relation(:basic_table).by_price(item[:price]).one! }.to raise_error(Aws::DynamoDB::Errors::ValidationException) }
+        specify { expect { subject.relation(:hash_table).by_price(item[:price]).one! }.to raise_error(Aws::DynamoDB::Errors::ValidationException) }
       end
 
       describe '#by_id.#with_expression.#with_projection' do
         let(:response) {
-          subject.relation(:basic_table).by_id(id)
+          subject.relation(:hash_table).by_id(id)
             .with_expression("#pr" => "product_reviews")
             .with_expression("#ri" => "related_items")
             .with_projection("price, color, #pr.five_star, #ri[0], #ri[2], #pr.no_star, #ri[4]").one!

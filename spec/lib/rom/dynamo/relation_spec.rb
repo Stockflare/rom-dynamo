@@ -2,16 +2,16 @@ module ROM
   describe Dynamo::Relation do
 
     include_context 'dynamo' do
-      let(:table_name) { :basic_table }
+      let(:table_name) { :hash_table }
 
-      let(:table) { build(:basic_table, table_name: table_name.to_s) }
+      let(:table) { build(:hash_table, table_name: table_name.to_s) }
     end
 
     include_context 'rom setup' do
       let(:definitions) {
         Proc.new do
-          relation(:basic_table) { }
-          commands(:basic_table) do
+          relation(:hash_table) { }
+          commands(:hash_table) do
             define(:create) { result :one }
             define(:update) { result :one }
             define(:delete) { result :one }
@@ -21,9 +21,9 @@ module ROM
     end
 
     context 'creation' do
-      let(:basic) { build(:basic) }
+      let(:hash) { build(:hash) }
 
-      specify { expect { subject.command(:basic_table).create.call(basic) }.to_not raise_error }
+      specify { expect { subject.command(:hash_table).create.call(hash) }.to_not raise_error }
     end
 
   end
