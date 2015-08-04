@@ -2,7 +2,7 @@ require 'rom/repository'
 
 module ROM
   module Dynamo
-    class Repository < ROM::Gateway
+    class Gateway < ROM::Gateway
       def initialize(opts = {})
         raise "expected AWS Region" if opts[:region].nil?
         @connection = initialize_connection(opts)
@@ -10,7 +10,7 @@ module ROM
       end
 
       def dataset(name)
-        @datasets[name] ||= Relation::Dataset.new(name, @connection)
+        @datasets[name] ||= Relation::Dataset.new(name, connection)
       end
 
       def dataset?(name)

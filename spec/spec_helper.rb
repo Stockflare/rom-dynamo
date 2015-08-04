@@ -27,7 +27,7 @@ Dir[Pathname(__FILE__).dirname.join('factories/**/*.rb').to_s].each { |f| requir
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods
-  
+
   # Run specs in random order to surface order dependencies. If you find an
   # order dependency and want to debug it, you can fix the order by providing
   # the seed, which is printed after each run.
@@ -64,7 +64,6 @@ RSpec.configure do |config|
 
   # Stub DynamoDB before every test.
   config.before(:example) do
-    allow_any_instance_of(ROM::Dynamo::Repository)
-      .to receive(:initialize_connection).and_return(dynamo)
+    ROM::Dynamo.stub!(dynamo)
   end
 end
