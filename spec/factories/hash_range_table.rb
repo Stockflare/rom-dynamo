@@ -22,6 +22,27 @@ FactoryGirl.define do
       }]
     end
 
+    global_secondary_indexes do
+      [
+        {
+          index_name: 'by_id',
+          key_schema: [
+            {
+              attribute_name: :id,
+              key_type: :HASH
+            }
+          ],
+          projection: {
+            projection_type: "ALL"
+          },
+          provisioned_throughput: {
+            read_capacity_units: 1,
+            write_capacity_units: 1
+          }
+        }
+      ]
+    end
+
     provisioned_throughput do
       {
         :read_capacity_units => 1,

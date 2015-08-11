@@ -20,6 +20,28 @@ DynamoDB enables you to build really flexible and powerful queries. In addition 
 
 The upside, is that this adapter can provide you with a _full_ query interface, enabling you to build some pretty complex calls quite flexibly; the downside is that you actually need to know how to build these queries.
 
+## Aliasing AWS generated table names
+
+If you're using Cloudformations or migrating from a different system, you may have an auto-generated table name like `my-stack-name-PostDynamoDBTable-17V2MIJAWDJ4F3Q`, aliasing this name is as simple as defining the following in your `Relation` class:
+
+```
+class PostRelation < ROM::Relation[Application::ORM]
+  register_as :posts
+  dataset 'my-stack-name-PostDynamoDBTable-17V2MIJAWDJ4F3Q' # hardcoded magnificence!
+end
+```
+
+You can then access your relation with a more friendly name, ie. `rom.relation(:posts)`.
+
+## Testing your project with ROM::Dynamo
+
+At some stage, you will need to use [dynamodb-local]() so that you can begin to develop and test your project against a locally running DynamoDB (similar to how I test this adapter). To ease the stubbing of the client initialized inside the [Gateway]() class, you can use the following method:
+
+```
+dynamo = Aws::DynamoDB::Client.new(endpoint: 'http://localhost:8000')
+ROM::Dynamo.stub!(dynamo)
+```
+
 ## Development
 
 Tests are executed against a dynamodb-local docker container. To run the full suite, you will need to have [docker-compose](https://docs.docker.com/compose/install/) installed. Then simply run:

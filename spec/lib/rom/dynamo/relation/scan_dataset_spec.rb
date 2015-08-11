@@ -31,6 +31,13 @@ module ROM
             def with_projection(expr)
               scan(projection_expression: expr)
             end
+
+            def by_ids(ids)
+              map = {}
+              ids.each_with_index { |id, i| map[":id#{i}"] = id }
+              with_filter_expression("id in (#{map.keys.join(',')})")
+                .with_expression_values(map)
+            end
           end
 
           commands(:hash_table) do
@@ -139,6 +146,14 @@ module ROM
               ":id1" => item[:id],
               ":id2" => rand(10000),
             }).one!
+        }
+
+        specify { expect(response["title"]).to eq title }
+      end
+
+      describe 'by_id operator' do
+        let(:response) {
+          subject.relation(:hash_table).by_ids([item[:id], rand(10000)]).one!
         }
 
         specify { expect(response["title"]).to eq title }

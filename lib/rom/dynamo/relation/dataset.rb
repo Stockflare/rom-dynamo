@@ -21,6 +21,10 @@ module ROM
           build({ exclusive_start_key: key }) { |q| dup_as(Dataset, chain: q) }
         end
 
+        def batch_get(query = nil)
+          build(query) { |q| dup_as(BatchGetDataset, chain: q) }
+        end
+
         def restrict(query = nil)
           build(query) { |q| dup_as(Dataset, chain: q) }
         end
