@@ -25,7 +25,7 @@ module ROM
       private
 
       def initialize_connection(opts = {})
-        Aws::DynamoDB::Client.new(region: opts[:region])
+        Aws::DynamoDB::Client.new(opts)
       end
     end
   end
