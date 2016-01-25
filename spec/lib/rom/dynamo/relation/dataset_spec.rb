@@ -35,7 +35,10 @@ module ROM
 
           commands(:hash_range_table) do
             define(:create) { result :one }
+            define(:delete) { }
           end
+
+
         end
       }
     end
@@ -54,6 +57,16 @@ module ROM
           build(:hash_range, id: id, date: date)
         end
         items.each { |item| subject.command(:hash_range_table).create.call item }
+      end
+
+      describe 'delete record' do
+        let(:after) { (DateTime.now + time_step).iso8601 }
+
+        let(:key) { { id: id, date: after } }
+
+        before { subject.command(:hash_range_table).delete.call(key) }
+
+        specify { expect(subject.relation(:hash_range_table).by_id(id).after(:date, after).to_a.size).to eq num_of_items - 1 }
       end
 
       describe 'between all' do

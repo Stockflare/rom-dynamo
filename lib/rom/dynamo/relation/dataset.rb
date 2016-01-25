@@ -46,7 +46,7 @@ module ROM
         end
 
         def delete(hash)
-          connection.delete_item merge_table_name(hash)
+          connection.delete_item merge_table_name(key: hash)
         end
 
         def each(&block)
