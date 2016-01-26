@@ -1,6 +1,6 @@
 module ROM
   module Dynamo
-    module Plugin
+    module Plugins
       module Pagination
         class Pager
           include Options

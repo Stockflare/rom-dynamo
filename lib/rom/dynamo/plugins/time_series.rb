@@ -1,6 +1,6 @@
 module ROM
   module Dynamo
-    module Plugin
+    module Plugins
       module TimeSeries
         def self.included(klass)
           klass.class_eval do

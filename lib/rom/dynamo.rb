@@ -6,7 +6,13 @@ require 'rom/dynamo/version'
 require 'rom/dynamo/relation'
 require 'rom/dynamo/commands'
 require 'rom/dynamo/gateway'
-require 'rom/dynamo/plugin'
+require 'rom/dynamo/plugins'
+
+module ROM
+  MissingConfigurationError = Class.new(StandardError)
+end
+
+require 'rom/configuration_dsl'
 
 module ROM
   module Dynamo
