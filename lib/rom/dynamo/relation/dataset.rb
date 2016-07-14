@@ -49,6 +49,11 @@ module ROM
           connection.delete_item merge_table_name(key: hash)
         end
 
+        def update(key, hash, action = 'PUT')
+          update = { attribute_updates: Hash[hash.map { |k,v| [k, { value: v, action: action }] }] }
+          connection.update_item merge_table_name(update.merge(key: key))
+        end
+
         def each(&block)
           each_item(merge_table_name(@chain), &block)
         end

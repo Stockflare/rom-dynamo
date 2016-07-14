@@ -15,6 +15,11 @@ module ROM
         self
       end
 
+      def update(*args)
+        dataset.update(*args)
+        self
+      end
+
       def delete(*args)
         dataset.delete(*args)
         self

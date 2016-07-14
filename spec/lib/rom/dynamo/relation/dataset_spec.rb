@@ -36,6 +36,11 @@ module ROM
           commands(:hash_range_table) do
             define(:create) { result :one }
             define(:delete) { }
+            define(:update) do
+              def key(attributes)
+                { id: attributes[:id], date: attributes[:date] }
+              end
+            end
           end
 
 
@@ -67,6 +72,18 @@ module ROM
         before { subject.command(:hash_range_table).delete.call(key) }
 
         specify { expect(subject.relation(:hash_range_table).by_id(id).after(:date, after).to_a.size).to eq num_of_items - 1 }
+      end
+
+      describe 'update record' do
+        let(:after) { (DateTime.now + time_step).iso8601 }
+
+        let(:data) { { foo: 'bar' } }
+
+        let(:key) { { id: id, date: after } }
+
+        before { subject.command(:hash_range_table).update.call(key.merge(data)) }
+
+        specify { expect(subject.relation(:hash_range_table).by_id(id).after(:date, after).to_a.first['foo']).to eq 'bar' }
       end
 
       describe 'between all' do
