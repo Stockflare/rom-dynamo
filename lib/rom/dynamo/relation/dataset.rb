@@ -50,8 +50,17 @@ module ROM
         end
 
         def update(key, hash, action = 'PUT')
-          update = { attribute_updates: Hash[hash.map { |k,v| [k, { value: v, action: action }] }] }
+          update = to_update_structure(hash)
           connection.update_item merge_table_name(update.merge(key: key))
+        end
+
+        def to_update_structure(hash)
+          values = {}
+          expr = 'SET ' + hash.map do |key, val|
+            values[":#{key}"] = val
+            "#{key}=:#{key}"
+          end.join(', ')
+          { expression_attribute_values: values, update_expression: expr }
         end
 
         def each(&block)
