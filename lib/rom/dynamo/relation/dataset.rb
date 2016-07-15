@@ -56,11 +56,18 @@ module ROM
 
         def to_update_structure(hash)
           values = {}
+          maps = {}
           expr = 'SET ' + hash.map do |key, val|
             values[":#{key}"] = val
-            "#{key}=:#{key}"
+            maps["##{key}"] = key
+            "##{key}=:#{key}"
           end.join(', ')
-          { expression_attribute_values: values, update_expression: expr }
+
+          {
+            expression_attribute_values: values,
+            expression_attribute_names: maps,
+            update_expression: expr
+          }
         end
 
         def each(&block)

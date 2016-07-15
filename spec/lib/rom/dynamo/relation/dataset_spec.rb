@@ -77,7 +77,7 @@ module ROM
       describe 'update record' do
         let(:after) { (DateTime.now + time_step).iso8601 }
 
-        let(:data) { { foo: 'bar', bar: 'foo' } }
+        let(:data) { { foo: 'bar', bar: { h: { y: 'h' } }, test: ['a','b'] } }
 
         let(:key) { { id: id, date: after } }
 
